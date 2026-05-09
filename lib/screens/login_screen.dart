@@ -25,18 +25,41 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    // Email formatını kontrol et
+    if (!_emailController.text.contains('@')) {
+      _snackbar('Geçerli bir email adresi girin', Colors.orange);
+      return;
+    }
+
     setState(() => _yukleniyor = true);
     final auth = context.read<AuthProvider>();
-    final basarili = await auth.girisYap(
-      _emailController.text.trim(),
-      _sifreController.text.trim(),
-    );
+    final basarili = _kayitModu
+        ? await auth.kayitOl(
+            _emailController.text.trim(),
+            _sifreController.text.trim(),
+          )
+        : await auth.girisYap(
+            _emailController.text.trim(),
+            _sifreController.text.trim(),
+          );
     setState(() => _yukleniyor = false);
 
     if (basarili && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      if (_kayitModu) {
+        _snackbar('Kayıt başarılı! Hoş geldiniz.', Colors.green);
+        setState(() => _kayitModu = false);
+        _emailController.clear();
+        _sifreController.clear();
+      } else {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } else if (mounted) {
-      _snackbar('Şifre en az 6 karakter olmalıdır!', Colors.red);
+      _snackbar(
+        _kayitModu
+            ? 'Kayıt başarısız! Email zaten kullanılıyor olabilir.'
+            : 'Email veya şifre hatalı!',
+        Colors.red,
+      );
     }
   }
 
@@ -250,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Test için: herhangi bir email\nve 6+ karakter şifre girin',
+                  'Supabase ile güvenli giriş',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 13,

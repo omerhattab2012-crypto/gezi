@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/place_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/app_provider.dart';
@@ -9,7 +10,14 @@ import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/settings_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://abfyldanzyutwaksysys.supabase.co',
+    anonKey: 'sb_publishable_3k4bVvaLnrrH6HKAOXbw_w_bLPEbQMc',
+  );
+
   runApp(
     MultiProvider(
       providers: [
